@@ -1,0 +1,4 @@
+REPO::identinetics/d-shibsp/==#77b695c
+REPO::identinetics/dscripts/==#90e0b81
+REPO::identinetics/dcshell/==#a9f1151
+FROM::intra/centos7_base==5182e96772bf
