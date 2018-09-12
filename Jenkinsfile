@@ -21,11 +21,18 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh '''
+                sh '''#!/bin/bash
                     [[ "$nocache" ]] && nocacheopt='-c' && echo 'build with option nocache'
                     export MANIFEST_SCOPE='local'
                     export PROJ_HOME='.'
-                    cp dc.yaml.default dc.yaml
+                    if [[ "$DOCKER_REGISTRY_USER" ]]; then
+                        echo "  Docker registry user: $DOCKER_REGISTRY_USER"
+                        perl -pe "s/^(\\s+)image:\\s+r2h2/\\$1image: \$DOCKER_REGISTRY_USER/" dc.yaml.default > dc.yaml
+                        perl -pe "s/^(\\s+)image:\\s+r2h2/\\$1image: \$DOCKER_REGISTRY_USER/" dc-setup.yaml.default > dc-setup.yaml
+                    else
+                        cp dc.yaml.default dc.yaml
+                        cp dc-setup.yaml.default dc-setup.yaml
+                    fi
                     ./dcshell/build -f dc.yaml $nocacheopt
                     echo "=== build completed with rc $?"
                 '''

@@ -6,7 +6,7 @@ services:
     hostname: shibsp
     labels:
       x.service: sp.example.org
-    restart: unless-stopped
+    #restart: unless-stopped
     environment:
         - SHIBDUSER=shibd
         - HTTPDUSER=httpd

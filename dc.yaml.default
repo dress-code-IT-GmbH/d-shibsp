@@ -3,7 +3,7 @@ services:
   shibsp:
     build:
       context: .
-    image: r2h2/shibsp
+    image: local/shibsp
     container_name: shibsp
     hostname: shibsp
     labels:
