@@ -90,7 +90,8 @@ pipeline {
                     echo "Keep container running"
                 else
                     echo 'Remove container, volumes'
-                    docker-compose -f dc.yaml rm --force -v pvzdpep 2>/dev/null || true
+                    docker-compose -f dc.yaml rm --force -v 2>/dev/null || true
+                    docker rm --force -v shibsp 2>/dev/null || true  # in case docker-compose fails ..
                 fi
             '''
         }
