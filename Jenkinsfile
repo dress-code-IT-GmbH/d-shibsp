@@ -6,7 +6,7 @@ pipeline {
         string(description: '"True": "Set --nocache for docker build; otherwise leave empty', name: 'nocache')
         string(description: '"True": push docker image after build; otherwise leave empty', name: 'pushimage')
         string(description: '"True": keep running after test; otherwise leave empty to delete container and volumes', name: 'keep_running')
- }
+    }
 
     stages {
         stage('Config ') {
@@ -40,7 +40,7 @@ pipeline {
                     [[ "$nocache" ]] && nocacheopt='-c' && echo 'build with option nocache'
                     export MANIFEST_SCOPE='local'
                     export PROJ_HOME='.'
-                     ./dcshell/build -f dc.yaml $nocacheopt
+                    ./dcshell/build -f dc.yaml $nocacheopt
                     echo "=== build completed with rc $?"
                 '''
             }
@@ -68,7 +68,7 @@ pipeline {
                 '''
             }
         }
-       stage('Push ') {
+        stage('Push ') {
             when {
                 expression { params.pushimage?.trim() != '' }
             }

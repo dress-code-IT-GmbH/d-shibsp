@@ -4,20 +4,22 @@ A Shibboleth configuration running apache httpd and shibd in a container, featur
 
 1. Image is based on centos7
 2. The (optional) express configuration uses a single YAML file to setup a shibboleth SP.
-3. The container is executed with reduced kernel capabilities
+3. The container is executed with reduced kernel capabilities after completing the setup.
 
 ## Prepare the repository
 
-    git clone https://github.com/identinetics/docker-shib-sp.git
-    cd docker-shib-sp
+    git clone https://github.com/identinetics/d-shibsp.git
+    cd d-shibsp
     git submodule update --init
     
 
 ## Build the docker image
 
-    cp conf.sh.default conf.sh
-    # edit conf.sh: set SERVICEDESCRIPTION, IMGID,
-    ./dscripts/build.sh 
+    cp dc.yaml.default docker-compose.yaml
+    cp dc-setup.yaml.default dc-setup.yaml  # provides default capabilties during setup
+    export MANIFEST_SCOPE='local'
+    export PROJ_HOME='.'
+    ./dcshell/build
 
 
 ## Initialize the container's persistent volumes
@@ -25,7 +27,7 @@ A Shibboleth configuration running apache httpd and shibd in a container, featur
 First, start the container with a shell.
 This will initialize the docker volumes without starting the services.
 
-    ./dscripts/run.sh -iCp bash
+    docker-compose -f dc-setup.yaml run --rm shibsp bash
 
 Now the container is initialized, but does not have a complete httpd and shibboleth configuration.
 
@@ -78,7 +80,7 @@ An existing configuration might be duplicated on the same or migrated to another
 - Adapt shibboleth2.xml, attribute-map.xml and attribute-policy.xml in VOLROOT.etc_shibboleth/ 
 - create a new sp key and metadata:
  
-    `dscripts/run.sh -i  # start container in interactive mode`
+    `docker-compose -f dc-setup.yaml run --rm shibsp bash  # start container in interactive mode`
     `cd /etc/shibboleth; ./keygen.sh -f`
     `chown shibd-user sp-*`
     `metagen.sh`
