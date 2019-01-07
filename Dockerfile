@@ -9,7 +9,7 @@ ARG TIMEZONE='UTC'
 RUN ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
 RUN yum -y update \
- && yum -y install curl httpd ip lsof mod_php mod_ssl net-tools \
+ && yum -y install curl httpd ip logrotate lsof mod_php mod_ssl net-tools \
  && yum -y install curl git iproute lsof net-tools openssl tar unzip which wget \
  #&& yum -y install yum install https://centos7.iuscommunity.org/ius-release.rpm \
  #&& yum -y install python36u python36u-pip \

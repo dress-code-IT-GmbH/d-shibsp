@@ -61,9 +61,7 @@ Check/modify the config files in /etc/shibboleth according to the documentation,
 
 ## Start the container in operational mode
 
-    ./dscripts/run.sh              # start container in daemon mode
-    ./dscripts/manage.sh logs      # show container stdout and stderr (showing critical errors during startup)
-    ./dscripts/manage.sh logfiles  # list log files as configured in conf.sh (more in /var/log/)
+    docker-compose [-f config] up -d           # start container in daemon mode
 
 
 ## Duplicating/migrating an existing configuration
@@ -105,3 +103,41 @@ SERVER_NAME	sp.example.org
 SERVER_PORT	443
 
 Check if the request is directed to the vHost, e.g. by checking the access log.
+
+## Logging
+
+The default configuration comprises following logfile locations and the respective config files:
+
+|===
+| Output location | Configuration
+| /var/log/httpd/error.log| /etc/httpd/conf/httpd.conf
+| /var/log/httpd/vhost_access.log| /etc/httpd/conf/httpd.conf
+| /var/log/httpd/error.log| /etc/httpd/conf/httpd.conf
+| /var/log/shibboleth-www/native.log| /etc/shibboleth/native.logger
+| /var/log/shibboleth-www/native_warn.log| /etc/shibboleth/native.logger
+| /var/log/shibboleth/shibd.log| /etc/shibboleth/shibd.logger
+| /var/log/shibboleth/shibd_warn.log| /etc/shibboleth/shibd.logger
+| /var/log/shibboleth/signature.log| /etc/shibboleth/shibd.logger
+| /var/log/shibboleth/transaction.log| /etc/shibboleth/shibd.logger
+|===
+
+Note: Not all files are being used in the default configuration.
+
+By default, shibboleth rotates log files, but apache does not.
+To have a consistent logfile rotation you may want to use the logrotate utility for both shibd and httpd.
+
+To disable log rotatation in shibd change each log4j.appender in native.logger and shibd.logger
+from RollingFileAppender to FileAppender, like this (6 log files):
+
+#log4j.appender.shibd_log=org.apache.log4j.RollingFileAppender
+#log4j.appender.shibd_log.maxFileSize=10000000
+#log4j.appender.shibd_log.maxBackupIndex=10
+log4j.appender.shibd_log=org.apache.log4j.FileAppender
+log4j.appender.shibd_log.fileName=/var/log/shibboleth/shibd.log
+
+Logrotation is executed with /opt/bin/logrotate.sh.
+It needs to be started from some cron-like service on the docker host, such as:
+
+    docker.compose [-f config] exec <service> /opt/bin/rotate_logs.sh  # <service> is 'shibsp' by default
+
+Logrotation may be customized by editing /opt/etc/logrotate/logrotate.conf
