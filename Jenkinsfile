@@ -1,5 +1,15 @@
 pipeline {
     agent any
+    environment {
+        compose_cfg='dc.yaml'
+        compose__setup_cfg='dc-setup.yaml'
+        compose_f_opt='-f dc.yaml'
+        container='shibsp'
+        d_containers="${container} dc_${container}_run_1"
+        d_volumes="${container}.etc_openldap ${container}.var_db"
+        network='dfrontend'
+        service='shibsp'
+    }
     options { disableConcurrentBuilds() }
     parameters {
         string(defaultValue: 'True', description: '"True": initial cleanup: remove container and volumes; otherwise leave empty', name: 'start_clean')
@@ -11,52 +21,60 @@ pipeline {
     stages {
         stage('Config ') {
             steps {
-                sh '''
-                   if [[ "$DOCKER_REGISTRY_USER" ]]; then
+                 sh '''#!/bin/bash -e
+                    echo "using ${compose_cfg} as docker-compose config file"
+                    if [[ "$DOCKER_REGISTRY_USER" ]]; then
                         echo "  Docker registry user: $DOCKER_REGISTRY_USER"
-                        ./dcshell/update_config.sh dc.yaml.default > dc.yaml
-                        ./dcshell/update_config.sh dc-setup.yaml.default > dc-setup.yaml
+                        ./dcshell/update_config.sh "${compose_cfg}.default" $compose_cfg
+                        ./dcshell/update_config.sh "${compose_setup_cfg}.default" $compose_setup_cfg
                     else
-                        cp dc.yaml.default dc.yaml
-                        cp dc-setup.yaml.default dc-setup.yaml
+                        cp "${compose_cfg}.default" $compose_cfg
+                        cp "${compose_setup_cfg}.default" $compose_setup_cfg
                     fi
-                    head dc.yaml
+                    egrep '( image:| container_name:)' $compose_cfg || echo "missing keys in ${compose_cfg}"
                 '''
-            }
+           }
         }
         stage('Cleanup ') {
             when {
                 expression { params.$start_clean?.trim() != '' }
             }
             steps {
-                sh '''
-                    docker-compose -f dc.yaml down -v 2>/dev/null | true
+                sh '''#!/bin/bash -e
+                    source ./jenkins_scripts.sh
+                    remove_containers $d_containers && echo '.'
+                    remove_volumes $d_volumes && echo '.'
                 '''
             }
         }
         stage('Build') {
             steps {
-                sh '''#!/bin/bash
-                    [[ "$nocache" ]] && nocacheopt='-c' && echo 'build with option nocache'
+                sh '''#!/bin/bash -e
+                    source ./jenkins_scripts.sh
+                    remove_container_if_not_running
+                    if [[ "$nocache" ]]; then
+                         nocacheopt='-c'
+                         echo 'build with option nocache'
+                    fi
                     export MANIFEST_SCOPE='local'
                     export PROJ_HOME='.'
-                    ./dcshell/build -f dc.yaml $nocacheopt
-                    echo "=== build completed with rc $?"
+                    ./dcshell/build $compose_f_opt $nocacheopt
                 '''
             }
         }
         stage('Setup + Run') {
             steps {
-                sh '''#!/bin/bash
+                sh '''#!/bin/bash -e
                     >&2 echo "setup test config"
                     docker-compose -f dc-setup.yaml run --rm shibsp \
                         cp /opt/install/config/express_setup_citest.yaml /opt/etc/express_setup_citest.yaml
                     docker-compose -f dc-setup.yaml run --rm shibsp \
-                        /opt/install/scripts/express_setup.sh -s express_setup_citest.yaml
+                        /opt/install/scripts/express_setup.sh -c express_setup_citest.yaml -a || rc=$?
+                    if ((rc>0)); then echo 'express setup failed'; exit 1; fi
                     >&2 echo "start server"
-                    docker-compose -f dc.yaml up -d
+                    docker-compose $compose_f_opt up -d
                     sleep 2
-                    docker-compose -f dc.yaml logs shibsp
+                    docker-compose $compose_f_opt logs shibsp
                 '''
             }
         }
@@ -64,7 +82,7 @@ pipeline {
             steps {
                 sh '''
                     sleep 1
-                    docker-compose -f dc.yaml exec -T shibsp /opt/install/tests/test_sp.sh
+                    docker-compose $compose_f_opt exec -T shibsp /opt/install/tests/test_sp.sh
                 '''
             }
         }
@@ -73,12 +91,13 @@ pipeline {
                 expression { params.pushimage?.trim() != '' }
             }
             steps {
-                sh '''
+                sh '''#!/bin/bash -e
                     default_registry=$(docker info 2> /dev/null |egrep '^Registry' | awk '{print $2}')
                     echo "  Docker default registry: $default_registry"
-                    export MANIFEST_SCOPE='local'
-                    export PROJ_HOME='.'
-                    ./dcshell/build -f dc.yaml -P
+                    ./dcshell/build $compose_f_opt -P
+                    rc=$?
+                    ((rc>0)) && echo "'docker-compose push' failed with code=${rc}"
+                    exit $rc
                 '''
             }
         }
@@ -89,9 +108,9 @@ pipeline {
                 if [[ "$keep_running" ]]; then
                     echo "Keep container running"
                 else
-                    echo 'Remove container, volumes'
-                    docker-compose -f dc.yaml rm --force -v 2>/dev/null || true
-                    docker rm --force -v shibsp 2>/dev/null || true  # in case docker-compose fails ..
+                    source ./jenkins_scripts.sh
+                    remove_containers $d_containers && echo 'containers removed'
+                    remove_volumes $d_volumes && echo 'volumes removed'
                 fi
             '''
         }

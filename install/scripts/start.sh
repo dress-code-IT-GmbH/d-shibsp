@@ -6,13 +6,13 @@ function main {
         echo "must start shibd and httpd as root"
         exit 1
     fi
-    cleanup_and_prep
+    cleanup_and_prep_shibd
     start_shibd
     start_httpd
 }
 
 
-function cleanup_and_prep {
+function cleanup_and_prep_shibd {
 
     # correct ownership (docker run will reset the ownership of volumes at creation time).
     # Only a problem with /etc/shibboleth, where mod_shib needs to have access with the httpd id
@@ -40,7 +40,7 @@ function start_httpd {
     #su - $HTTPDUSER  -c 'httpd -DFOREGROUND -d /etc/httpd/ -f conf/httpd.conf'
 
     # logging to stderr requires httpd to start as root (inside docker as of 17.05.0-ce)
-    rm -f /run/httpd/* 2>/dev/null || true
+    rm -f /run/httpd/* /var/log/httpd/httpd.pid 2>/dev/null || true
     httpd -t -d /etc/httpd/ -f conf/httpd.conf
     httpd -DFOREGROUND -d /etc/httpd/ -f conf/httpd.conf
 

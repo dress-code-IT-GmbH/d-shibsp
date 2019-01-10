@@ -22,3 +22,9 @@ if (( $?>0 )); then
     cat /tmp/authRequest.http
     exit 3
 fi
+
+#curl \
+#    -H "X-Forwarded-Host: www.termino.gv.at" \
+#    -H "X-Forwarded-Proto: https" \
+#    -H "X-Forwarded-For: 8.8.8.8" \
+#    http://localhost:8080/Shibboleth.sso/Login

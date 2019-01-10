@@ -1,8 +1,9 @@
-Common
-    entityID: https://sp.example.org/sp
+---
+Common:
+    entityID: "https://sp.example.org/sp"
     hostname: sp.example.org
 
-Metadata
+Metadata:
     entity-category: http://www.ref.gv.at/ns/names/agiz/pvp/egovtoken
     xml_lang: en
     mdui_DisplayName: BKA Mitarbeiter (Test, extern)
@@ -19,8 +20,9 @@ Metadata
     OrganizationDisplayName: Bundeskanzleramt
     OrganizationUrl: https://www.bka.gv.at
 
-Shibboleth2
-    ApplicationDefaults.REMOTE_USER: persistent-id targeted-id uid X-PVP-USERID X-PVP-GID X-PVP-BPK 
+Shibboleth2:
+    ApplicationDefaults.REMOTE_USER: persistent-id targeted-id uid X-PVP-USERID X-PVP-GID X-PVP-BPK
     ApplicationDefaults.signing: true
     Sessions.SSO: discoveryProtocol="SAMLDS" discoveryURL="https://disco.test.portalverbund.gv.at/role/idp.ds"
-    MetadataProvider type="XML" validate="true" file="/opt/md_feed/metadata.xml"
+    MetadataProvider: type="XML" url="http://mdfeed.test.portalverbund.gv.at/metadata.xml" backingFilePath="metadata_backing.xml"
+    Profile: at.gv.pvp2.egov_token
