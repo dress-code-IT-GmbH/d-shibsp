@@ -40,6 +40,7 @@ function start_httpd {
     #su - $HTTPDUSER  -c 'httpd -DFOREGROUND -d /etc/httpd/ -f conf/httpd.conf'
 
     # logging to stderr requires httpd to start as root (inside docker as of 17.05.0-ce)
+    # pidfile in /run/httpd requires added kernel capabilities -> move to /var/log
     rm -f /run/httpd/* /var/log/httpd/httpd.pid 2>/dev/null || true
     httpd -t -d /etc/httpd/ -f conf/httpd.conf
     httpd -DFOREGROUND -d /etc/httpd/ -f conf/httpd.conf

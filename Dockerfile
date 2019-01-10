@@ -41,8 +41,10 @@ RUN groupadd --gid $SHIBDGID shibd \
 
 
 # prepare express setup from /opt/install/etc
+RUN mkdir -p /opt/etc/shibboleth/attr_mapping
 COPY install /opt/install
 COPY install/opt /opt
+COPY install/etc/shibboleth/attr_mapping /opt/etc/shibboleth/attr_mapping
 COPY install/www/* /var/www/vhost/html/
 COPY install/scripts/* /opt/bin/
 RUN chmod +x /opt/bin/*.sh \

@@ -1,5 +1,5 @@
 ---
-Common:
+httpd:
     entityID: "https://sp.example.org/sp"
     hostname: sp.example.org
 
