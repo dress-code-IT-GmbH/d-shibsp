@@ -1,3 +1,3 @@
 #!/bin/bash
 
-logrotate /opt/etc/logrotate/logrotate.conf
+logrotate --state /var/log/logrotate/logrotate.status /opt/etc/logrotate/logrotate.conf

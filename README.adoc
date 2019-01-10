@@ -47,8 +47,9 @@ To prepare the express setup, make an edited copy of `/opt/install/config/expres
 This is a persistent volume and can be used to repeat the express configuration.
 Then run:
 
-    /opt/install/scripts/express_setup.sh
+    /opt/install/scripts/express_setup.sh -a
 
+Keys and metadata can be generated again with options -k, -K and -s.
 
 #### Shibboleth SP further configuration
 
@@ -61,8 +62,10 @@ Check/modify the config files in /etc/shibboleth according to the documentation,
 
 ## Start the container in operational mode
 
-    docker-compose [-f config] up -d           # start container in daemon mode
+    docker-compose [-p <zone>] [-f config] up -d           # start container in daemon mode
 
+To avoid "Found orphan containers" warnings from docker-compose a project/op-zone (such as qa, pr) may be specified.
+It as no practical effect except suppressing the warning message.
 
 ## Duplicating/migrating an existing configuration
 
