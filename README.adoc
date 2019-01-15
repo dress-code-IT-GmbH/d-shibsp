@@ -91,7 +91,7 @@ An existing configuration might be duplicated on the same or migrated to another
 - edit static contents in VOLROOT.var_www
 - Besides the SP configuration the load balancer, TLS-certificate and DNS-name need to be configured
 
-## Debugging HTTPS Proxy configurations
+## Testing and Debugging HTTPS Proxy configurations
 
 The proxy must send x-forwarded headers:
 HTTP_X_FORWARDED_HOST	sp.example.org
