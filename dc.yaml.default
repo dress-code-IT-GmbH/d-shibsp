@@ -16,8 +16,7 @@ services:
     #ports:
     #  - "80:8080"
     networks:
-      dockernet:
-        ipv4_address: 10.1.1.5
+      jenkins:
     volumes:
         - shibsp.etc_httpd_conf:/etc/httpd/conf:Z
         - shibsp.etc_httpd_conf.d:/etc/httpd/conf.d
@@ -35,9 +34,10 @@ services:
       - setgid
       - chown
       - net_raw
+
 networks:
-  dockernet:
-    external: true
+  jenkins:
+
 volumes:
     shibsp.etc_httpd_conf:
     shibsp.etc_httpd_conf.d:

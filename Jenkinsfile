@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         compose_cfg='dc.yaml'
-        compose__setup_cfg='dc-setup.yaml'
+        compose_setup_cfg='dc-setup.yaml'
         compose_f_opt='-f dc.yaml'
         container='shibsp'
         d_containers="${container} dc_${container}_run_1"
@@ -25,8 +25,8 @@ pipeline {
                     echo "using ${compose_cfg} as docker-compose config file"
                     if [[ "$DOCKER_REGISTRY_USER" ]]; then
                         echo "  Docker registry user: $DOCKER_REGISTRY_USER"
-                        ./dcshell/update_config.sh "${compose_cfg}.default" $compose_cfg
-                        ./dcshell/update_config.sh "${compose_setup_cfg}.default" $compose_setup_cfg
+                        ./dcshell/update_config.sh "${compose_cfg}.default" > $compose_cfg
+                        ./dcshell/update_config.sh "${compose_setup_cfg}.default" > $compose_setup_cfg
                     else
                         cp "${compose_cfg}.default" $compose_cfg
                         cp "${compose_setup_cfg}.default" $compose_setup_cfg
