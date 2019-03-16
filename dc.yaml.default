@@ -33,7 +33,8 @@ services:
       - setuid
       - setgid
       - chown
-      - net_raw
+      #- net_raw
+      - kill
 
 networks:
   jenkins:
