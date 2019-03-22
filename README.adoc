@@ -146,6 +146,6 @@ log4j.appender.shibd_log.fileName=/var/log/shibboleth/shibd.log
 Logrotation is executed with /opt/bin/logrotate.sh.
 It needs to be started from some cron-like service on the docker host, such as:
 
-    docker.compose [-f config] exec <service> /opt/bin/rotate_logs.sh  # <service> is 'shibsp' by default
+    docker.compose [-f config] exec <service> /opt/bin/rotate_logs.sh [-v] # <service> is 'shibsp' by default
 
 Logrotation may be customized by editing /opt/etc/logrotate/logrotate.conf
