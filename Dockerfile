@@ -5,7 +5,7 @@ LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
 
 # allow build behind firewall
 ARG HTTPS_PROXY=''
-ARG TIMEZONE='UTC'
+ARG TIMEZONE='Europe/Vienna'
 RUN ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
 RUN yum -y update \

@@ -58,7 +58,8 @@ pipeline {
                     fi
                     export MANIFEST_SCOPE='local'
                     export PROJ_HOME='.'
-                    ./dcshell/build $compose_f_opt $nocacheopt
+                    ./dcshell/build $compose_f_opt $nocacheopt || \
+                        (rc=$?; echo "build failed with rc rc?"; exit $rc)
                 '''
             }
         }
