@@ -1,0 +1,31 @@
+---
+httpd:
+    hostname: proxy1.test.portalverbund.gv.at
+
+Metadata:
+    entity-category: http://www.ref.gv.at/ns/names/agiz/pvp/egovtoken
+    xml_lang: en
+    mdui_DisplayName: SP mit WSGI Test App
+    mdui_Description: SP mit WSGI Test App
+    mdui_Logo:
+    wantsAuthnRequestSigned: yes
+    ContactPerson_support_Givenname: Rainer
+    ContactPerson_support_Surname: Hörbe
+    ContactPerson_support_Email: rainer@hoerbe.at
+    ContactPerson_technical_Givenname: Rainer
+    ContactPerson_technical_Surname: Hörbe
+    ContactPerson_technical_Email: rainer@hoerbe.at
+    OrganizationName: AG-IZ
+    OrganizationDisplayName: AG-IZ
+    OrganizationUrl: https://www.wien.gv.at
+
+Shibboleth2:
+    ApplicationDefaults.REMOTE_USER: persistent-id targeted-id uid X-PVP-USERID X-PVP-GID X-PVP-BPK
+    ApplicationDefaults_signing: "true"
+    entityID: "https://proxy1.test.portalverbund.gv.at/sp"
+    Errors_supportContact: admin@testdom.test
+    hostname: proxy1.test.portalverbund.gv.at
+    Sessions.SSO: discoveryProtocol="SAMLDS" discoveryURL="https://disco.test.portalverbund.gv.at/role/idp.ds"
+    MetadataProvider_url: https://mdfeed.testdom.test/metadata.xml
+    Profile: at.gv.pvp2.egov_token
+    REMOTE_USER: X-PVP-BPK X-PVP-GID X-PVP-USERID persistent-id targeted-id
