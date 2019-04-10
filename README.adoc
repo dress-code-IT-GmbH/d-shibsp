@@ -24,7 +24,8 @@ A Shibboleth configuration running apache httpd and shibd in a container, featur
 
 ## Initialize the container's persistent volumes
  
-First, start the container with a shell.
+First, start the container with a shell and without restrcihted capabilties.
+For this copy docker-compose.yaml to dc-setup.yaml and remove the cap_drop key.
 This will initialize the docker volumes without starting the services.
 
     docker-compose -f dc-setup.yaml run --rm shibsp bash
@@ -47,7 +48,8 @@ To prepare the express setup, make an edited copy of `/opt/install/config/expres
 This is a persistent volume and can be used to repeat the express configuration.
 Then run:
 
-    /opt/install/scripts/express_setup.sh -a -c /opt/etc/express_setup.yaml 
+    export PYTHONWARNINGS="ignore" # ignore YAMlload issue
+    /opt/install/scripts/express_setup.sh -a -c express_setup.yaml
 
 Keys and metadata can be generated again with options -k, -K and -s.
 

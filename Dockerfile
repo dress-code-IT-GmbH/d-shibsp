@@ -1,4 +1,4 @@
-FROM intra/centos7_base
+FROM intra/centos7_py36_base
 # intra/centos7_base is a synonym to centos:7
 LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
       capabilities='--cap-drop=all --cap-add=dac_override --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_raw'
@@ -9,7 +9,7 @@ ARG TIMEZONE='Europe/Vienna'
 RUN ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
 RUN yum -y update \
- && yum -y install curl httpd ip logrotate lsof mod_php mod_ssl net-tools \
+ && yum -y install curl httpd ip logrotate lsof mod_php mod_ssl mod_wsgi net-tools \
  && yum -y install curl git iproute lsof net-tools openssl psmisc tar unzip which wget \
  #&& yum -y install yum install https://centos7.iuscommunity.org/ius-release.rpm \
  #&& yum -y install python36u python36u-pip \
@@ -53,15 +53,10 @@ RUN chmod +x /opt/bin/*.sh \
  && mkdir -p /etc/httpd/conf /etc/httpd/conf.d
 
 
-# require py3 + yaml for express setup, manifest2.sh
-RUN yum -y install epel-release \
- && yum -y install python34 libxslt \
- && yum clean all && rm -rf /var/cache/yum \
- && ln -sf /usr/bin/python3.4 /usr/bin/python3 \
- && curl https://bootstrap.pypa.io/get-pip.py | python3.4 \
- && pip3.4 install jinja2 PyYaml \
- && mkdir -p $HOME/.config/pip \
- && printf "[global]\ndisable-pip-version-check = True\n" > $HOME/.config/pip/pip.conf
+# require jinja + yaml for express setup, manifest2.sh
+RUN pip3 install jinja2 pyyaml
+
+
 RUN mkdir /var/log/startup \
  && chmod 777 /var/log/startup  # must be writeable by root
 

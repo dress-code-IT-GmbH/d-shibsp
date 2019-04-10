@@ -15,6 +15,7 @@ function main {
         cleanup_and_prep_shibd
         start_shibd
         start_httpd
+        trap "propagate_signals" SIGTERM
     fi
 }
 
@@ -88,6 +89,11 @@ function start_httpd {
 function restart_httpd {
     echo "restarting httpd"
     /usr/sbin/httpd -d /etc/httpd/ -f conf/httpd.conf -k graceful
+}
+
+propagate_signals() {
+    kill -s SIGTERM $(cat /var/log/httpd/httpd.pid)
+    kill -s SIGTERM $(cat /var/run/shibboleth/shib.pid)
 }
 
 
