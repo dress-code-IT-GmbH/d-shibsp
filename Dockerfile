@@ -1,7 +1,8 @@
-FROM intra/centos7_py36_base
-# intra/centos7_base is a synonym to centos:7
-LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
-      capabilities='--cap-drop=all --cap-add=dac_override --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_raw'
+FROM intra/ubi7-py36-memcached
+# intra/ubi7-py36 is registry.access.redhat.com/ubi7/python-36 with memcached installed
+
+USER root
+LABEL capabilities='--cap-drop=all --cap-add=dac_override --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_raw'
 
 # allow build behind firewall
 ARG HTTPS_PROXY=''
@@ -9,19 +10,14 @@ ARG TIMEZONE='Europe/Vienna'
 RUN ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
 RUN yum -y update \
- && yum -y install curl httpd ip logrotate lsof mod_php mod_ssl mod_wsgi net-tools \
- && yum -y install curl git iproute lsof net-tools openssl psmisc tar unzip which wget \
- #&& yum -y install yum install https://centos7.iuscommunity.org/ius-release.rpm \
- #&& yum -y install python36u python36u-pip \
+ && yum -y install httpd iputils logrotate mod_php mod_ssl mod_wsgi net-tools psmisc \
  && yum clean all && rm -rf /var/cache/yum
 COPY install/security:shibboleth.repo /etc/yum.repos.d
-# above command cannot be executed on a system with --storage-opt=AUFS (as of 2016-04)
 
 RUN echo $'export LD_LIBRARY_PATH=/opt/shibboleth/lib64:$LD_LIBRARY_PATH\n' > /etc/sysconfig/shibd \
- && chmod +x /etc/sysconfig/shibd \
+ && chmod +x /etc/sysconfig/shibd
  # beware: yum update may re-install packages and reset ownerships/permissions to defaults.
  # therefore set permissions always after yum update
- && yum update -y
 
 # Run https and shibd as a non-root user, separate uids for httpd and shibd, with common group shibd.
 # Allow httpd/mod_shib access to /var/run/shibboleth and /etc/shibboleth using group shibd
