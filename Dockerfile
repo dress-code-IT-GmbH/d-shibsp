@@ -3,8 +3,8 @@
 # intra/ubi7-py36 is registry.access.redhat.com/ubi7/python-36 with memcached installed
 # https://github.com/dress-code-IT-GmbH/d-centos7-py36-memcached
 # centos/python-36-centos7 + memcached
-# and label it as intra/rhorcs7-py36-memcached
-FROM intra/rhorcs7-py36-memcached
+# and label it as local/rhorcs7-py36-memcached
+FROM local/rhorcs7-py36-memcached
 
 USER root
 LABEL capabilities='--cap-drop=all --cap-add=dac_override --cap-add=setuid --cap-add=setgid --cap-add=chown --cap-add=net_raw'
